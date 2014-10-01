@@ -3,7 +3,7 @@
 		<wd tx="Blah" id="0" oc="1" />
 	</dico>
 	<sts>
-		<st oc="1" -1="Blah" -2="Blah" >
+		<st id="0" po="1" >
 			<fw id="0" oc="1" />
 		</st>
 	</sts>
