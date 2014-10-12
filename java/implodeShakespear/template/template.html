@@ -9,10 +9,11 @@
 		<![endif]-->
 		<script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
 		<script>
-			function newLetter() {
-				var txt = $("#textInput").val();
-				var pjs = Processing.getInstanceById('@@id@@');
-				if (txt.charAt(txt.length-1)==' ') {
+			var lastText="";
+			function newLetter(event) {
+				if ($("#textInput").val()!=lastText&&event.keyCode!=8) {
+					var txt = $("#textInput").val();
+					var pjs = Processing.getInstanceById('@@id@@');
 					var separators = [' ', '?', '(', ')',  ',', '.', '!', ';', '"', '\'', '\r', '\n'];
 					var words = txt.split(new RegExp('[' + separators.join('') + ']', 'g'));
 					for (var i=0;i<words.length;i++) {
@@ -21,28 +22,26 @@
 							i--;
 						}
 					}
+					var lastWord = "";
+					pjs.informAllWords(words);
+					if (txt.charAt(txt.length-1)!=' ') {
+						var lastWord = words[words.length-1];
+						if (words.length>0) words.splice(words.length-1,1);
+					}			
 					if (words.length>3) words.splice(0,words.length-3);
 					words.reverse();
-					var newWord = pjs.wordSuggestionFor(words);
-					$("#textInput").val($("#textInput").val()+newWord);
-					words.reverse();
-					// $("#debug").html(words+" -> "+newWord);
-					var input = document.getElementById("textInput");
-					input.setSelectionRange($("#textInput").val().length-newWord.length, $("#textInput").val().length);
-					input.focus();
-				} else {
-					var separators = [' ', '?', '(', ')',  ',', '.', '!', ';', '"', '\'', '\r', '\n'];
-					var words = txt.split(new RegExp('[' + separators.join('') + ']', 'g'));
-					var lastWord = words[words.length-1];
-					var newWord = pjs.wordCompletionFor(lastWord);
+					var newWord = pjs.wordSuggestionFor(words,lastWord);
 					$("#debug").html(newWord);
+					$("#debug").html("words : "+words+"<br/>"+"lastWord : "+lastWord+"<br/>"+"newWord : "+newWord);
+					if (txt.charAt(txt.length-1)!=' '&&newWord=="") var newWord = pjs.wordCompletionFor(lastWord);
 					$("#textInput").val($("#textInput").val()+newWord);
 					var input = document.getElementById("textInput");
 					input.setSelectionRange($("#textInput").val().length-newWord.length, $("#textInput").val().length);
 					input.focus();
+					lastText=$("#textInput").val();
+					// $("#debug").html(event.keyCode);
 				}
 			}
-			
 		</script>
 		<script src="processing.js" type="text/javascript"></script>@@scripts@@
 	</head>
@@ -52,7 +51,7 @@
 				<canvas id="@@id@@" data-processing-sources="@@sketch@@.pde" width="@@width@@" height="@@height@@" style="display:none;" ><p>Your browser does not support the canvas tag.</p></canvas>
 				<noscript><p>JavaScript is required to view the contents of this page.</p></noscript>
 	    	</div>
-			<textarea id="textInput" onkeyup="newLetter()" style="width:500px;height:500px;" ></textarea>
+			<textarea id="textInput" onkeyup="newLetter(event)" style="width:500px;height:500px;" ></textarea>
 			<div id="debug"></id>
  		</div>
 	</body>
