@@ -1,0 +1,57 @@
+I've always had this strange fetish about generating narration and text with a computer. That's a very vague goal and I can think of many possible approach to reach it. Some of them require the computer to be aware of certain structures, grammar or even predefined sentences. I'll focus here on a more arbitrary method to stack words one after each other based on data learned from a set of reference texts.
+
+Aiming for a general-purpose method is pretty cool in my opinion because it can ideally be trained on any set of characters regardless of the language (in some case it could even be used to process music or some form of code). As a primary objective I wanted to avoid anything random or too contextual, but of course sooner or later I've always been obliged to add parameters, make difficult choices and use subjective logic.
+
+The first thing that usually comes in mind when trying to generate new texts out of pre-existing ones is to use weighted Markov chains. For some reason I always want to expand the logic a bit since languages are usually a lot more complex than a series of context-free states.
+
+One of my previous attempts to generate infinite literature involved splitting a reference text into many tokens using delimiters (tokens being usually words and delimiters being spaces) and then storing chains of tokens with a size from 1 to n (assuming the bigger n was the most interesting the results could become but this also meant larger database and slower analysis/generation).
+I could then start with a few words and compare them with all existing chains. Using small chains would reduce the chances of coming up with properly formatted grammar but big ones would just tend to recreate the original text. So out of the matching ones it would pick one only those that contained at least t tokens but could be able to spawn at least f different following states (t and f being parameters). The algorithm could also look one step forward to avoid going through the same looping over and over or go back it it feels stuck in a dead-end.
+
+At some point I thought it would make sense to use this technique as an auto-completion tool rather than as a fully automated generator. This present ongoing project is divided into two parts : an off-line database builder and a JavaScript text editor.
+
+The database builder.
+The database still consists on chains of up to three words (I choose to call those "structures") and for each of them a list of potential followers with the number of occurrences that have been encountered through the analysis of texts.
+It also contains a simple dictionary of all words with an integer index and the number of occurrences for each of them, regardless of the context.
+The idea was to allow the user to switch between several presets constructed after the analysis of several books by a few famous authors, one preset for each author.
+One obvious issue was the size of the databases (which in this case are stored in an XML file) so I quickly figured I had to trim them to only the most relevant informations, especially because it was meant to be loaded online and I didn't want it to take forever.
+The trimming process is tricky ; let's say I want to make it read a few books in a raw (a folder with several .txt files in it). Since the analysis time is exponential, I can't afford to process the full corpus of books before I start trimming. 
+I could choose to make a trimming pass after each book but then the order in which books are loaded matters and that would result in common words in each book being favored over words that are reused over the whole corpus (for instance in the case of Jules Verne it would tend to keep words like "Nemo" rather than "professeur" and I don't want that).
+
+So here is what I choose to do :
+- for each book in the corpus, build a dictionary (where size is usually ok since each word in only represented once)
+- clean the dictionary (remove rarely represented words until the number of them doesn't exceed a certain threshold)
+- for each book in the corpus, check every structure but only keep track of those where all the words match the existing dictionary
+- clean the structures to keep only the most frequent ones
+
+Even by keeping only 500 words and cleaning structures with less than 2 occurrences the current database can still grow up to 2Mb which is still too much in my opinion but there is still a lot of room for optimization and at least it is at no point flooded with data during the analysis. I'm currently trimming to 3000 words which seems to be the average number of words knowned by a human. 
+
+Problem : I'm using all sort of delimiters including spaces but also line feed, punctuation and special characters (I haven't filtered out all oddities that can be found in e-books yet). Since the text will be later reconstructed with spaces, expressions like "I'm here" will become "I m here". How to store informations about the delimiters to recreate the text in a nice way ?
+Solution : I choose to not care about it.
+
+The online editor. 
+The editor algorithm can help either by proposing you a new word, or by adding letters to the ones you've already started to type.
+Even though the tool has been thought as a user-oriented interface, it's still possible to "automate" the process simply by inputing one word and then adding spaces between each new proposition.
+
+Unlike previous attempts, instead of searching for a specific chain to tokens each time a suggestion is requested I'm going through all the known dictionary words and attributing them a score if it matches the previous already written words in respect to their position. The closest the matching words are to the potential suggestion, the higher the score gets. The word with the higher score will be chosen.
+
+The idea is that if the sentence "This is my dog" has been seen at least once, then out of "This is a" the generator could suggest "This is a dog" because the whole sequence seems to match regarless of the word being right before "dog". I hoped this would allow for more grammatical consistency, the downside of course is that the generator could often say stuff like "This is it. dog." that make arguable sense.
+I'm still not sure why this score formula would be better than any other but just wanted to try out of curiosity, it's easy to spot the unwanted biases of this method by looking at the results. The actual formula I settled to so far somehow looks like : 
+for (each word in dictionary) for (every position from 1 to 3) if (the word matches for this position) word.score += occurrence/(position*2+2);
+If no word has a positive score then the editor will only base its assumptions on the number of occurrences encountered in the reference corpus, omitting all infos about structures.
+
+Problem : The result of this algorithm is fine but usually always ends up looping through the same three or four very common words ("the", "of", "a" ...).
+Solution : I didn't want to rely on randomness to solve it, so the alternative I choose was to avoid words that have already been used in the text being generated especially those being used recently, I tried to do it so these common would fade away from the stats by themselves when being used and then come back later so the text would automatically "balance" itself. 
+
+I probably haven't found the right formula for the word-balancing part yet because I've noticed some kind of proper grammar only shows up after a few dozen words (or never depending on the context) and common words start to disappear too much at some point while I believe it should be possible to keep everything constant. The current formula is something like : 
+for (each word with a positive score) if (the word has been used already) word.finalScore = log(word.score+1) + 1+(for (each occurrence in text) position in text / number of words in the entire text);
+
+Am I happy about it ?
+On a scale from "even more useless as usual" to "has started to replicate itself already", I'll leave the rating of this generator up to you. I took the habit of always running my text-tools on a sample of Jules Verne novels as a first try, so I can compare the results. Overall I think there has been some improvement from last time, I could even articulate some generated sentences out loud without scaring anybody in the room too much.
+I also found some curiosity in other outputs, the semantic field of some authors seems very specific, for instance with Andersen everything is always "tiny" or "big".
+
+The presets included in the page were made at various points through the development and older/newer ones might not always fit with this explanation.
+
+Although I've written pseudo-code about it many years before, most of the recent improvement were made during the databit.me festival in Arles, France. As a presentation I thought it would make sense to explain all the whys and hows of it. Of course I'm always interested to talk with people with the same fetish so if you have some feedback, ideas, results, authors you'd like to add or anything to share, feel free to mail me !
+
+Morusque[at]gmail.com
+

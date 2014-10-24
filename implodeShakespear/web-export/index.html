@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+	<head>
+		<meta property="og:title" content="Writing assistant" />
+		<meta name="description" content="High-precision literature made easy." />
+		<meta property="og:description" content="High-precision literature made easy." />
+		<meta name="keywords" content="writing, assistant, auto-completion, maybe, useful" />
+		<meta property="og:image" content="http://www.officialdatabase.org/writingAssistant/icon01.png" />
+		<meta property="og:url" content="http://www.officialdatabase.org/" />
+		<meta property="og:type" content="website" />
+		<meta name="author" content="Morusque" />
+		<link rel="icon"  type="image/x-icon" href="http://www.officialdatabase.org/writingAssistant/icon01.png" /> 
+		<meta charset="UTF-8" />
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<title>Writing assistant</title>
+		<style type="text/css">
+		</style>
+		<!--[if lt IE 9]>
+			<script type="text/javascript">alert("Your browser does not support the canvas tag.");</script>
+		<![endif]-->
+		<script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
+		<script>
+			var lastText="";
+			function reloadDatabase() {
+					$("#loadIndic").html("loading database, be patient...");
+					var baseUrl = $("#AuthorSelection>option:selected").attr("url");
+					var pjs = Processing.getInstanceById('@@id@@');
+					pjs.loadBase(baseUrl);
+					$("#loadIndic").html("loading done !");
+			}
+			function newLetter(event) {
+				if ($("#textInput").val()!=lastText&&event.keyCode!=8) {
+					var txt = $("#textInput").val();
+					var pjs = Processing.getInstanceById('@@id@@');
+					var separators = [' ', '?', '(', ')',  ',', '.', '!', ';', '"', '\'', '\r', '\n'];
+					var words = txt.split(new RegExp('[' + separators.join('') + ']', 'g'));
+					for (var i=0;i<words.length;i++) {
+						if (words[i].length==0) {
+							words.splice(i,1);
+							i--;
+						}
+					}
+					var lastWord = "";
+					pjs.informAllWords(words);
+					if (txt.charAt(txt.length-1)!=' ') {
+						var lastWord = words[words.length-1];
+						if (words.length>0) words.splice(words.length-1,1);
+					}			
+					if (words.length>3) words.splice(0,words.length-3);
+					words.reverse();
+					var newWord = pjs.wordSuggestionFor(words,lastWord);
+					$("#debug").html(newWord);
+					$("#debug").html("words : "+words+"<br/>"+"lastWord : "+lastWord+"<br/>"+"newWord : "+newWord);
+					if (txt.charAt(txt.length-1)!=' '&&newWord=="") var newWord = pjs.wordCompletionFor(lastWord);
+					$("#textInput").val($("#textInput").val()+newWord);
+					var input = document.getElementById("textInput");
+					input.setSelectionRange($("#textInput").val().length-newWord.length, $("#textInput").val().length);
+					input.focus();
+					lastText=$("#textInput").val();
+					// $("#debug").html(event.keyCode);
+				}
+			}
+			$(document).ready(function(){
+				$('#triggerLoad').click(function(){
+					reloadDatabase();
+				});
+			});
+		</script>
+		<script src="processing.js" type="text/javascript"></script>
+	</head>
+	<body style="text-align:center;">
+		<div id="content">
+			Select a preset : <select id="AuthorSelection">
+			  <option url="emptyDatabase.xml" selected="selected">---</option>
+			  <option url="bases/Flaubert.xml">Gustave Flaubert (fr)</option>
+			  <option url="bases/Andersen.xml">Hans Christian Andersen (fr translated)</option>
+			  <option url="bases/Shakespear.xml">William Shakespear (en)</option>
+			  <option url="bases/Jules Verne.xml">Jules Verne (fr)</option>
+			  <option url="bases/Molière.xml">Molière (fr)</option>
+			  <option url="bases/Victor Hugo.xml">Victor Hugo (fr)</option>
+			  <option url="bases/Lovecraft.xml">Howard Phillips Lovecraft (en)</option>
+			  <option url="bases/Einstein.xml">Albert Einstein (en)</option>
+			  <option url="bases/KJ Bible.xml">King James Bible (en)</option>
+			  <option url="bases/Chaos Digest.xml">Chaos Digest (en)</option>
+			  <option url="bases/Political discourses.xml">Discours politiques (fr)</option>
+			</select> <button id="triggerLoad">load database</button> <span id="loadIndic"></span><br/><br/>
+			Now write a masterpiece : <br/>
+			<div>
+				<canvas id="@@id@@" data-processing-sources="implodeShakespear.pde" width="@@width@@" height="@@height@@" style="display:none;" ><p>
+					Your browser does not support the canvas tag.</p></canvas>
+				<noscript><p>JavaScript is required to view the contents of this page.</p></noscript>
+	    	</div>
+			<textarea id="textInput" onkeyup="newLetter(event)" style="width:500px;height:500px;" ></textarea>
+			<div id="debug" style="display:none;" ></id>
+			<br/>
+ 		</div>
+		<br/><br/>
+		<a href="about.txt" style="font-size:11px;" >a few words about this</a><br/>
+	</body>
+</html>
+
