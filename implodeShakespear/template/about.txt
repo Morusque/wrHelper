@@ -54,4 +54,5 @@ The presets included in the page were made at various points through the develop
 Although I've written pseudo-code about it many years before, most of the recent improvement were made during the databit.me festival in Arles, France. As a presentation I thought it would make sense to explain all the whys and hows of it. Of course I'm always interested to talk with people with the same fetish so if you have some feedback, ideas, results, authors you'd like to add or anything to share, feel free to mail me !
 
 Morusque[at]gmail.com
+btw this is on github https://github.com/Morusque/wrHelper
 

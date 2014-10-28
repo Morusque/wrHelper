@@ -4,8 +4,8 @@
 		<meta name="description" content="High-precision literature made easy." />
 		<meta property="og:description" content="High-precision literature made easy." />
 		<meta name="keywords" content="writing, assistant, auto-completion, maybe, useful" />
-		<meta property="og:image" content="http://www.officialdatabase.org/writingAssistant/icon01.png" />
-		<meta property="og:url" content="http://www.officialdatabase.org/" />
+		<meta property="og:image" content="http://www.officialdatabase.org/writingAssistant/icon02.png" />
+		<meta property="og:url" content="http://www.officialdatabase.org/writingAssistant/" />
 		<meta property="og:type" content="website" />
 		<meta name="author" content="Morusque" />
 		<link rel="icon"  type="image/x-icon" href="http://www.officialdatabase.org/writingAssistant/icon01.png" /> 
@@ -85,16 +85,22 @@
 			</select> <button id="triggerLoad">load database</button> <span id="loadIndic"></span><br/><br/>
 			Now write a masterpiece : <br/>
 			<div>
-				<canvas id="@@id@@" data-processing-sources="implodeShakespear.pde" width="@@width@@" height="@@height@@" style="display:none;" ><p>
-					Your browser does not support the canvas tag.</p></canvas>
-				<noscript><p>JavaScript is required to view the contents of this page.</p></noscript>
+				<canvas id="@@id@@" data-processing-sources="@@sketch@@.pde" 
+						width="@@width@@" height="@@height@@" style="display:none;" >
+					<p>Your browser does not support the canvas tag.</p>
+					<!-- Note: you can put any alternative content here. -->
+				</canvas>
+				<noscript>
+					<p>JavaScript is required to view the contents of this page.</p>
+				</noscript>
 	    	</div>
 			<textarea id="textInput" onkeyup="newLetter(event)" style="width:500px;height:500px;" ></textarea>
 			<div id="debug" style="display:none;" ></id>
 			<br/>
  		</div>
 		<br/><br/>
-		<a href="about.txt" style="font-size:11px;" >a few words about this</a><br/>
+		<div style="font-size:11px;">press "right" to accept a suggestion<br/></div>
+		<a href="about.txt" style="font-size:11px;" >about</a><br/>
 	</body>
 </html>
 
