@@ -28,7 +28,15 @@
 					$("#loadIndic").html("loading done !");
 			}
 			function newLetter(event) {
-				if ($("#textInput").val()!=lastText&&event.keyCode!=8) {
+				if ($("#smartphone").is(':checked')) {
+					if (event.keyCode==32) {// space
+						$("#textInput").val(lastText+" ");
+					}
+					if (event.keyCode==8||event.keyCode==46) {// backspace or delete
+						lastText=$("#textInput").val();
+					}
+				}
+				if ($("#textInput").val()!=lastText&&!(event.keyCode==8||event.keyCode==46)) {// other keys
 					var txt = $("#textInput").val();
 					var pjs = Processing.getInstanceById('@@id@@');
 					var separators = [' ', '?', '(', ')',  ',', '.', '!', ';', '"', '\'', '\r', '\n'];
@@ -42,9 +50,9 @@
 					var lastWord = "";
 					pjs.informAllWords(words);
 					if (txt.charAt(txt.length-1)!=' ') {
-						var lastWord = words[words.length-1];
+						lastWord = words[words.length-1];
 						if (words.length>0) words.splice(words.length-1,1);
-					}			
+					}
 					if (words.length>3) words.splice(0,words.length-3);
 					words.reverse();
 					var newWord = pjs.wordSuggestionFor(words,lastWord);
@@ -82,7 +90,12 @@
 			  <option url="bases/KJ Bible.xml">King James Bible (en)</option>
 			  <option url="bases/Chaos Digest.xml">Chaos Digest (en)</option>
 			  <option url="bases/Political discourses.xml">Discours politiques (fr)</option>
+			  <option url="bases/Celine.xml">Louis-Ferdinand Céline (fr)</option>
+			  <option url="bases/William S. Burroughs.xml">William S. Burroughs (en)</option>
+			  <option url="bases/Feast day cookbook (en).xml">Feast day cookbook (en)</option>
+			  <option url="bases/asciiArt.xml">ASCII art files and tutos (en)</option>
 			</select> <button id="triggerLoad">load database</button> <span id="loadIndic"></span><br/><br/>
+			<input type="checkbox" id="smartphone" /> smartphone style (use space & delete keys) <br/><br/>
 			Now write a masterpiece : <br/>
 			<div>
 				<canvas id="@@id@@" data-processing-sources="@@sketch@@.pde" 

@@ -46,7 +46,7 @@ I probably haven't found the right formula for the word-balancing part yet becau
 for (each word with a positive score) if (the word has been used already) word.finalScore = log(word.score+1) + 1+(for (each occurrence in text) position in text / number of words in the entire text);
 
 Am I happy about it ?
-On a scale from "even more useless as usual" to "has started to replicate itself already", I'll leave the rating of this generator up to you. I took the habit of always running my text-tools on a sample of Jules Verne novels as a first try, so I can compare the results. Overall I think there has been some improvement from last time, I could even articulate some generated sentences out loud without scaring anybody in the room too much.
+From "even more useless than usual" to "has started to replicate itself already", I'll leave the rating of this generator up to you. I took the habit of always running my text-tools on a sample of Jules Verne novels as a first try, so I can compare the results. Overall I think there has been some improvement from last time, I could even articulate some generated sentences out loud without scaring anybody in the room too much.
 I also found some curiosity in other outputs, the semantic field of some authors seems very specific, for instance with Andersen everything is always "tiny" or "big".
 
 The presets included in the page were made at various points through the development and older/newer ones might not always fit with this explanation.

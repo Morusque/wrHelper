@@ -280,4 +280,3 @@ String[] getAllFilesFrom(String folderUrl) {
     return empty;
   }
 }
-
